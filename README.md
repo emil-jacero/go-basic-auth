@@ -21,7 +21,7 @@ The service requires the following environment variables to be set:
 To build the Docker image, run:
 
 ```sh
-docker build -t auth-service .
+make docker-build
 ```
 
 ### Run the Container
@@ -29,7 +29,7 @@ docker build -t auth-service .
 To run the container with the required environment variables, use:
 
 ```sh
-docker run -e AUTH_USERNAME=testuser -e AUTH_PASSWORD=testpassword -p 9001:9001 auth-service
+docker run -e AUTH_USERNAME=testuser -e AUTH_PASSWORD=testpassword -p 9001:9001 grpc-basic-auth
 ```
 
 Replace testuser and testpassword with your desired credentials.
@@ -41,58 +41,7 @@ Replace testuser and testpassword with your desired credentials.
 To test the service without an Authorization header, run:
 
 ```sh
-curl -v http://localhost:9001/
-```
 
-You should receive a 403 Forbidden response.
-
-#### With Authorization Header
-
-To test the service with a valid Authorization header, run:
-
-```sh
-curl -v -H "Authorization: Bearer testuser:testpassword" http://localhost:9001/
-```
-
-You should receive a 200 OK response if the credentials are valid.
-
-#### Example Test Script
-
-You can use the following script to automate testing:
-
-```sh
-#!/bin/bash
-
-echo "Testing without Authorization header..."
-response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9001/)
-if [ "$response" -eq 403 ]; then
-    echo "PASS: Received 403 Forbidden without Authorization header"
-else
-    echo "FAIL: Expected 403 Forbidden but received $response"
-fi
-
-echo "Testing with valid Authorization header..."
-response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer testuser:testpassword" http://localhost:9001/)
-if [ "$response" -eq 200 ]; then
-    echo "PASS: Received 200 OK with valid Authorization header"
-else
-    echo "FAIL: Expected 200 OK but received $response"
-fi
-
-echo "Testing with invalid Authorization header..."
-response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer invalidtoken" http://localhost:9001/)
-if [ "$response" -eq 403 ]; then
-    echo "PASS: Received 403 Forbidden with invalid Authorization header"
-else
-    echo "FAIL: Expected 403 Forbidden but received $response"
-fi
-```
-
-Save this script to a file (e.g., test.sh), make it executable, and run it:
-
-```sh
-chmod +x test.sh
-./test.sh
 ```
 
 ## Code Structure
